@@ -119,6 +119,10 @@ class TrackerTree < Tree
     end
 
     def editnode(node)
+        if node.root?
+            alert("Can't edit this node.")
+            return
+        end
         key = node.to_s
         table = @treemodel.getlinktable(key)
         id = @treemodel.getlinkid(key)
@@ -135,6 +139,22 @@ class TrackerTree < Tree
     end
 
     def assign_to_node(node)
+        if node.root?
+            if confirm("Add new event?")
+                h = %w[Name Location Group Start_Date End_Date]
+                row = ['', '', '', Date.today.strftime("%m/%d/%Y"), Date.today.strftime("%m/%d/%Y")]
+                row = edit(h, row, " New Event ")
+                if !row.nil?
+                    ev = Event.create(name: row[0], location: row[1], group: row[2], start_date: Date.strptime(row[3], "%m/%d/%Y"), end_date: Date.strptime(row[4], "%m/%d/%Y"))
+                    key = "#{ev.name} #{ev.start_date} #{ev.end_date}"
+                    evnode = TrackerNode.new(key)
+                    @treemodel.addlink(key, 'event', ev.id)
+                    node.add(evnode)
+                    @repaint_required = true
+                end
+            end
+            return
+        end
         key = node.to_s
         table = @treemodel.getlinktable(key)
         id = @treemodel.getlinkid(key)

@@ -4,6 +4,15 @@ require 'rbcurse/core/widgets/tree/treemodel'
 class TrackerTreeModel < DefaultTreeModel
     attr_accessor :treetodblink
 
+    def root(*args, &block)
+        super
+        if !@root.is_a? TrackerNode
+            n = TrackerNode.new @root
+            @root = n
+        end
+        @root
+    end
+
     def addlink(key, table, id)
         if @treetodblink.nil?
             @treetodblink = {}
@@ -31,6 +40,10 @@ class TrackerNode < TreeNode
 
     def updatenode(new_object)
         @user_object = new_object
+    end
+
+    def root?
+        parent.nil?
     end
 
 end
