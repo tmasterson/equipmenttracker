@@ -5,6 +5,7 @@ require_relative 'model/specialty'
 require_relative 'model/item'
 require_relative 'model/event_specialty'
 require_relative 'trackertreemodel'
+require_relative 'utils'
 require 'date'
 
 class TrackerTree < Tree
@@ -190,7 +191,7 @@ class TrackerTree < Tree
             alert("All specialties have already been selected for this event.")
             selected = []
         else
-            selected = get_selections(unassigned)
+            selected = get_selections(unassigned, 'Select from unassigned Specialties')
         end
         if selected.empty?
             if confirm("Add new specialty and assign?")
@@ -233,7 +234,7 @@ class TrackerTree < Tree
             alert("All equipment have already been selected for this specialty.")
             selected = []
         else
-            selected = get_selections(unassigned)
+            selected = get_selections(unassigned, 'Select from unassigned equipment')
         end
         if selected.empty?
             if confirm("Add new item and assign?")
@@ -277,7 +278,7 @@ class TrackerTree < Tree
             alert("All equipment have already been selected for this item.")
             selected = []
         else
-            selected = get_selections(unassigned)
+            selected = get_selections(unassigned, 'Select from unassigned equipment')
         end
         if selected.empty?
             if confirm("Add new item and assign?")
@@ -299,14 +300,6 @@ class TrackerTree < Tree
             node.add(unassigned[i])
             @treemodel.addlink(unassigned[i], 'item', item.id)
         end
-    end
-
-    def get_selections(alist)
-        listconfig = {}
-        listconfig[:selection_mode] = :multiple
-        listconfig[:show_selector] = true
-        selected = popuplist(alist, listconfig)
-        return selected
     end
 
 end

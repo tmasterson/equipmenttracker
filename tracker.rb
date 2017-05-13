@@ -12,6 +12,7 @@ require 'lib/model/item'
 require 'lib/model/event_specialty'
 require 'lib/trackertree'
 require 'lib/trackertreemodel'
+require 'lib/utils'
 
 def help_text
     <<-eos
@@ -21,23 +22,6 @@ here as you want
 end
 
 App.new do 
-    def trackertree config={}, &block
-      events = [:TREE_WILL_EXPAND_EVENT, :TREE_EXPANDED_EVENT, :TREE_SELECTION_EVENT, :PROPERTY_CHANGE, :LEAVE, :ENTER ]
-      block_event = nil
-      # if no width given, expand to flows width
-      useform = nil
-      w = TrackerTree.new useform, config, &block
-      w.width ||= :expand 
-      w.height ||= :expand # TODO This has to come before other in stack next one will overwrite.
-      _position w
-      return w
-    end
-
-    def db_connect
-        db_config = YAML::load(File.open('config/database.yml'))
-        ActiveRecord::Base.establish_connection(db_config)
-    end
-
     ## application code comes here
     @form.help_manager.help_text = help_text()
 
@@ -77,6 +61,15 @@ App.new do
             end
             bind_key(?e, "Edit") do
                 editnode(current_row)
+            end
+            bind_key(FFI::NCurses::KEY_F2, 'Import Events') do
+                import('events')
+            end
+            bind_key(FFI::NCurses::KEY_F3, 'Import Specialties') do
+                import('specialties')
+            end
+            bind_key(FFI::NCurses::KEY_F4, 'Import Equipment') do
+                import('equipment')
             end
         end
     end

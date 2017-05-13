@@ -7,4 +7,5 @@ class Item < ApplicationRecord
   validates :item_no, presence: true
   validates :serial, presence: true, length: { minimum: 4, maximum: 10 }, uniqueness: true
   validates :item_type, presence: true
+  validates :item_no, uniqueness: { scope: :item_type, message: 'Number should be unique per type' }
 end
