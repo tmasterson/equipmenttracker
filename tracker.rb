@@ -59,6 +59,9 @@ App.new do
             bind_key(?a, 'Assign') do
                 assign_to_node(current_row)
             end
+            bind_key(?u, 'Unassign') do
+                unassign_from_node(current_row)
+            end
             bind_key(?e, "Edit") do
                 editnode(current_row)
             end

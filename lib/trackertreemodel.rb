@@ -35,6 +35,10 @@ class TrackerTreeModel < DefaultTreeModel
         node.updatenode(new_key)
     end
 
+    def deletekey(key)
+        @treetodblink.delete(key)
+    end
+
 end
 class TrackerNode < TreeNode
 

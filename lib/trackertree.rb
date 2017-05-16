@@ -15,31 +15,6 @@ class TrackerTree < Tree
         @editable = true
     end
 
-    def edit h, row, title
-        _l = longest_in_list h
-        _w = _l.size
-        config = { :width => 70, :title => title }
-        bw = get_color $datacolor, :black, :white
-        $log.debug("editrow #{row.inspect}")
-        mb = MessageBox.new config do
-            h.each_with_index { |f, i| 
-                add Field.new :label => "%*s:" % [_w, f], :text => row[i].chomp, :name => i.to_s, 
-                    :bgcolor => :cyan,
-                    :display_length => 50,
-                    :label_color_pair => bw
-            }
-            button_type :ok_cancel
-        end
-        index = mb.run
-        return nil if index != 0
-        h.each_with_index { |e, i| 
-            f = mb.widget(i.to_s)
-            row[i] = f.text
-        }
-        row
-    end
-
-
     def edit_event(node, key, id)
         event = Event.find(id)
         h = %w[Name Location Group Start_Date End_Date]
@@ -300,6 +275,39 @@ class TrackerTree < Tree
             node.add(unassigned[i])
             @treemodel.addlink(unassigned[i], 'item', item.id)
         end
+    end
+
+    def unassign_from_node(node)
+        key = node.to_s
+        parentkey = node.parent.to_s
+        table = @treemodel.getlinktable(key)
+        parenttable = @treemodel.getlinktable(parentkey)
+        id = @treemodel.getlinkid(key)
+        parentid = @treemodel.getlinkid(parentkey)
+        if node.root? or table == 'event'
+            alert('You cannot remove this from the tree.')
+            return
+        elsif table == 'specialty'
+            event = Event.find(parentid)
+            event.specialties.delete(id)
+        else
+            if parenttable == 'specialty'
+                specialty = Specialty.find(parentid)
+                specialty.itmes.delete(id)
+            else
+                item = Item.find(parentid)
+                item.subitems.delete(id)
+            end
+        end
+        remove_node(node)
+        @treemodel.deletekey(key)
+        @repaint_required = true
+    end
+
+    def remove_node(node)
+        obj = @list.delete_at(@current_index)
+        @current_index = @current_index-1
+        goto_parent
     end
 
 end
